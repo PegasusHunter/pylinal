@@ -4,7 +4,7 @@ import subprocess
 from typing import List
 
 
-def parse_readme(readme_path: str):
+def parse_readme(readme_path: str) -> List:
     
     with open(readme_path, 'r') as f:
         readme = f.read()
@@ -19,13 +19,15 @@ def parse_readme(readme_path: str):
 
 def test_readme():
     paths = ['./README.md', '../README.md']
+
+    scripts = []
     for i, path in enumerate(paths):
         try:
             scripts = parse_readme(path)
             break
         except FileNotFoundError:
             if i == len(paths) - 1:
-                raise FileNotFoundError
+                raise FileNotFoundError('Cant find README file')
     assert len(scripts) != 0
 
     tmp_file = 'tmp_readme.py'
@@ -35,11 +37,9 @@ def test_readme():
         
         command: str = f'python3 {tmp_file}'
         args: list = command.split()
-
         result = subprocess.run(args, stdout=subprocess.PIPE)
 
-        returncode: int = result.returncode
-        success = returncode == 0
+        success: bool = result.returncode == 0
         if not success:
             stdout: str = result.stdout.decode()
             raise AssertionError(stdout)

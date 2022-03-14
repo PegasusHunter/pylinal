@@ -1,6 +1,10 @@
-build
+venv
 
-pylinal.egg-info
+build
+dist
+
+*.idea
+*.egg-info
 
 **/__pycache__
 

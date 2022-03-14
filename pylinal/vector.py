@@ -5,28 +5,36 @@ T = TypeVar('T')
 
 
 class Vector(Generic[T]):
-    elements: List[T]
+    _elements: List[T]
     
     def __init__(self, sequence: Union[Iterator[T], Sequence[T]]) -> None:
-        self.elements = [el for el in sequence]
+        self._elements = [el for el in sequence]
+        return
 
-    def __add__(self, other: 'Vector') -> 'Vector':
+    def copy(self) -> 'Vector':
+        return Vector(el for el in self)
+
+    def __add__(self, other: Union['Vector', Any]) -> 'Vector':
+        other = Vector(other)
+
         try:
             assert len(self) == len(other)
         except AssertionError:
             error = 'To __add__ two vectors, the dimensions must be the same,'\
                     f' but dim {len(self)} != dim {len(other)}'
-            raise AssertionError(error)
+            raise ValueError(error)
 
         return Vector(x + y for x, y in zip(self, other))
     
-    def __sub__(self, other: 'Vector') -> 'Vector':
+    def __sub__(self, other: Union['Vector', Any]) -> 'Vector':
+        other = Vector(other)
+
         try:
             assert len(self) == len(other)
         except AssertionError:
             error = 'To __sub__ two vectors, the dimensions must be the same,'\
                     f' but dim {len(self)} != dim {len(other)}'
-            raise AssertionError(error)
+            raise ValueError(error)
 
         return Vector(x - y for x, y in zip(self, other))
     
@@ -35,14 +43,16 @@ class Vector(Generic[T]):
     
     def __rmul__(self, scalar: T) -> 'Vector':
         return Vector(scalar*x for x in self)
-    
-    def dot(self, other: Union['Vector', Sequence[T]]) -> T:
+
+    def dot(self, other: Union['Vector', Any]) -> T:
+        other = Vector(other)
+
         try:
             assert len(self) == len(other)
         except AssertionError:
             error = 'To dot two vectors, the dimensions must be the same,'\
                     f' but dim {len(self)} != dim {len(other)}'
-            raise AssertionError(error)
+            raise ValueError(error)
 
         return sum(x*y for x, y in zip(self, other))
     
@@ -69,18 +79,33 @@ class Vector(Generic[T]):
         return True
 
     def __getitem__(self, index: int) -> T:
-        return self.elements[index]
+        return self._elements[index]
+
+    def __setitem__(self, index: int, value: Any) -> None:
+        self._elements[index] = value
+        return
     
     def __len__(self) -> int:
-        return len(self.elements)
+        return len(self._elements)
     
     def __iter__(self) -> Iterator[T]:
-        return iter(self.elements)
+        return iter(self._elements)
     
     def __reversed__(self) -> Iterator[T]:
-        return reversed(self.elements)
-    
-    def __repr__(self) -> str:
-        return f'Vector({self.elements})'
+        return reversed(self._elements)
 
+    def __iadd__(self, other: Union['Vector', Any]) -> 'Vector':
+        self = self + Vector(other)
+        return self
+
+    def __isub__(self, other: Union['Vector', Any]) -> 'Vector':
+        self = self - Vector(other)
+        return self
+
+    def __imul__(self, scalar: T) -> 'Vector':
+        self = scalar * self
+        return self
+
+    def __repr__(self) -> str:
+        return f'Vector({self._elements})'
 
