@@ -14,7 +14,7 @@ from .vectorfunc import VectorFunc
 T = TypeVar('T')
 
 
-class MatrixFunc:
+class MatrixFunc(Matrix):
     matrix: Matrix[Func]
 
     def __init__(

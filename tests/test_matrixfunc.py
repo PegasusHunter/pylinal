@@ -16,7 +16,7 @@ class TestMatrixFunc:
     def test_example():
         rand = lambda: random.randint(-10, 10)
 
-        shape = (abs(rand()), abs(rand()))
+        shape = (1+abs(rand()), 1+abs(rand()))
         rows = [
             [rand() for _ in range(shape[1])]
             for _ in range(shape[0])
@@ -31,6 +31,8 @@ class TestMatrixFunc:
         assert f() * scalar == (f * scalar)() == matrix * scalar
 
         assert f() + matrix == (f + matrix)() == 2*matrix
+        assert matrix + f() == (matrix + f)() == 2*matrix
+
         assert f().T == f.T() == matrix.T
 
 
@@ -41,3 +43,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
