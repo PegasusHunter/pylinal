@@ -37,6 +37,10 @@ class MatrixFunc(Matrix):
         )
         return result
 
+    def copy(self) -> 'MatrixFunc':
+        return MatrixFunc(self.matrix.copy(), _MatrixFunc__wrap=False)
+        
+
     @property
     def shape(self) -> Tuple[int, int]:
         return self.matrix.shape
@@ -136,4 +140,9 @@ class MatrixFunc(Matrix):
         )
         rows: str = ',\n'.join(rows)
         return f'MatrixFunc([\n{rows}\n])'
+    
+    def __setitem__(self, index: int):
+        error = '"MatrixFunc" object has no attribute "__setitem__"'
+        raise AttributeError(error)
+
 

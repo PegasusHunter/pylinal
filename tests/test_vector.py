@@ -88,6 +88,9 @@ class TestVector:
         for i, el in enumerate(elements):
             assert el == a[i]
 
+        key: int = random.randint(0, dim)
+        assert a[:key] == Vector(elements[:key])
+
     def test_setitem(self):
         dim: int = random.randint(1, 5)
         elements: List[float] = random_elements(dim)

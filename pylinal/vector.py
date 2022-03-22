@@ -121,8 +121,12 @@ class Vector(Generic[T]):
             return False
         return True
 
-    def __getitem__(self, index: int) -> T:
-        return self._elements[index]
+    def __getitem__(self, key: Union[int, slice]) -> Union[T, 'Vector']:
+        if isinstance(key, slice):
+            v: Vector = Vector([])
+            v._elements = self._elements[key]
+            return v
+        return self._elements[key]
 
     def __setitem__(self, index: int, value: Any) -> None:
         self._elements[index] = value

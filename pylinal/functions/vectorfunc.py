@@ -27,7 +27,7 @@ class VectorFunc:
         __wrap: bool = True,
     ) -> None:
         if __wrap:
-            seq = [Func(f) for f in sequence]
+            seq = (Func(f) for f in sequence)
             self.vec = Vector(seq)
         else:
             self.vec = sequence

@@ -226,11 +226,36 @@ class TestMatrix:
             [1, 2, 3],
             [4, 5, 6]
         ])
-        assert a[0] == Vector([1, 2, 3])
-        assert a[1] == Vector([4, 5, 6])
+        assert a[0] == Vector([1, 2, 3]) == a[0, :]
+        assert a[1] == Vector([4, 5, 6]) == a[1, :]
 
         assert (a[0][0], a[0][1], a[0][2]) == (1, 2, 3)
         assert (a[1][0], a[1][1], a[1][2]) == (4, 5, 6)
+
+        
+        assert a[0:1] == Matrix([[1, 2, 3]])
+        assert a[0:] == a[:, :] == a
+        
+        assert a[:, 0] == Vector([1, 4])
+        assert a[:, 1] == Vector([2, 5])
+        assert a[:, 2] == Vector([3, 6])
+        
+        assert a[:, :1] == Matrix([
+            [1],
+            [4]
+        ])
+
+        assert a[:, 1:2] == Matrix([
+            [2],
+            [5]
+        ])
+        
+       
+        assert a[:, 2:3] == Matrix([
+            [3],
+            [6]
+        ])
+        
 
     def test_setitem(self):
         zero = Matrix([[0, 0], [0, 0]])

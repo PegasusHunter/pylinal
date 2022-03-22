@@ -42,8 +42,16 @@ class Matrix(Generic[T]):
     _rows: List[Vector[T]]
     shape: Tuple[int, int]
 
-    def __init__(self, rows: Union[Iterator, Sequence, 'Matrix']) -> None:
-        self._rows = [Vector(row) for row in rows]
+    def __init__(
+        self,
+        rows: Union[Iterator, Sequence, 'Matrix'],
+        *,
+        __wrap: bool = True,
+    ) -> None:
+        if __wrap:
+            self._rows = [Vector(row) for row in rows]
+        else:
+            self._rows = [row for row in rows]
 
         vec_len = len(self._rows[0])
         if any(vec_len != len(row) for row in self._rows[1:]):
@@ -57,8 +65,8 @@ class Matrix(Generic[T]):
         return rows
 
     def copy(self) -> 'Matrix':
-        rows: Iterator[Vector] = (v for v in self)
-        return Matrix(rows)
+        rows: Iterator[Vector] = (v.copy() for v in self)
+        return Matrix(rows, _Matrix__wrap=False)
 
     def __add__(self, other: Union['Matrix', Sequence]) -> 'Matrix':
         other = align_dim(self, other=other)
@@ -67,7 +75,7 @@ class Matrix(Generic[T]):
             row + wrap_vec(other_row)
             for row, other_row in zip(self, other)
         )
-        return Matrix(rows)
+        return Matrix(rows, _Matrix__wrap=False)
     
     def __radd__(self, other: Union['Matrix', Sequence]) -> 'Matrix':
         other = align_dim(self, other=other)
@@ -76,7 +84,7 @@ class Matrix(Generic[T]):
             wrap_vec(other_row) + row
             for row, other_row in zip(self, other)
         )
-        return Matrix(rows)
+        return Matrix(rows, _Matrix__wrap=False)
 
 
     def __sub__(self, other: Union['Matrix', Sequence]) -> 'Matrix':
@@ -86,7 +94,7 @@ class Matrix(Generic[T]):
             row - wrap_vec(other_row)
             for row, other_row in zip(self, other)
         )
-        return Matrix(rows)
+        return Matrix(rows, _Matrix__wrap=False)
 
     def __rsub__(self, other: Union['Matrix', Sequence]) -> 'Matrix':
         other = align_dim(self, other=other)
@@ -95,15 +103,15 @@ class Matrix(Generic[T]):
             wrap_vec(other_row) - row
             for row, other_row in zip(self, other)
         )
-        return Matrix(rows)
+        return Matrix(rows, _Matrix__wrap=False)
 
     def __mul__(self, scalar: T) -> 'Matrix':
         rows: Iterator[Vector[T]] = (row * scalar for row in self)
-        return Matrix(rows)
+        return Matrix(rows, _Matrix__wrap=False)
 
     def __rmul__(self, scalar: T) -> 'Matrix':
         rows: Iterator[Vector[T]] = (scalar * row for row in self)
-        return Matrix(rows)
+        return Matrix(rows, _Matrix__wrap=False)
 
     def matmul(self, other: Union['Matrix', Vector]) -> Union['Matrix', Vector]:
         """Linear transformation"""
@@ -147,6 +155,7 @@ class Matrix(Generic[T]):
     @property
     def T(self) -> 'Matrix':
         """Transpose of a matrix """
+        
         cols: Iterator = zip(*self._rows)
         return Matrix(cols)
 
@@ -155,7 +164,7 @@ class Matrix(Generic[T]):
 
     def __neg__(self) -> 'Matrix':
         rows: Iterator[Vector] = (-row for row in self)
-        return Matrix(rows)
+        return Matrix(rows, _Matrix__wrap=False)
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Matrix):
@@ -172,8 +181,34 @@ class Matrix(Generic[T]):
             return False
         return True
 
-    def __getitem__(self, index: int) -> Vector:
-        return self._rows[index]
+    def __getitem__(
+        self, 
+        key: Union[int, slice, tuple]
+    ) -> Union[Vector, 'T', 'Matrix']:
+
+        if isinstance(key, int):
+            return self._rows[key]
+
+        if isinstance(key, slice):
+            rows: Iterator[Vector] = (v for v in self._rows[key])
+            return Matrix(rows, _Matrix__wrap=False)
+
+        first, second = key
+
+        if isinstance(first, int):
+            return self._rows[first][second]
+
+        assert isinstance(first, slice)
+
+        if isinstance(second, int):
+            elements: Iterator[T] = (v[second] for v in self._rows[first])
+            return Vector(elements)
+
+        assert isinstance(second, slice)
+
+        rows: Iterator[Vector] = (v[second] for v in self._rows[first])        
+        return Matrix(rows, _Matrix__wrap=False)
+        
 
     def __setitem__(self, index: int, value: Any) -> None:
         value: Vector = wrap_vec(value)
