@@ -5,7 +5,8 @@ from typing import (
     Union,
 )
 
-T = TypeVar('T')
+from ..typedefs import T
+
 F = Union['Func', Callable[[Any], T]]
 
 

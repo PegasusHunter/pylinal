@@ -10,9 +10,7 @@ from typing import (
 )
 
 from .vector import Vector
-
-
-T = TypeVar('T')
+from .typedefs import T, TensorProtocol
 
 
 def wrap_vec(vec) -> Vector:
@@ -38,7 +36,7 @@ def align_dim(self: 'Matrix', *, other: Any) -> Union['Matrix', List]:
     return other
 
 
-class Matrix(Generic[T]):
+class Matrix(TensorProtocol[T]):
     _rows: List[Vector[T]]
     shape: Tuple[int, int]
 

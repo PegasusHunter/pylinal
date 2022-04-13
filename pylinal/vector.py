@@ -1,10 +1,8 @@
 from typing import List, TypeVar, Any, Sequence, Union, Iterator, Generic
+from .typedefs import T, TensorProtocol
 
 
-T = TypeVar('T')
-
-
-class Vector(Generic[T]):
+class Vector(TensorProtocol[T]):
     _elements: List[T]
     
     def __init__(

@@ -10,8 +10,7 @@ from ..matrix import Matrix, Vector
 from .func import Func
 from .vectorfunc import VectorFunc
 
-
-T = TypeVar('T')
+from ..typedefs import T
 
 
 class MatrixFunc(Matrix):

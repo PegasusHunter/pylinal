@@ -83,19 +83,25 @@ assert affine(x) == A @ x + v
 
 #### MatrixFunc
 
+MatrixFunc is a callable Matrix where each element is a function.
+It wraps each element in a primitive called "Func".
+The sum and multiplication by a scalar will be a MatrixFunc again.
+
 ```python
 from math import sin, cos, pi
 from pylinal import MatrixFunc, Vector
 
 
+# 3D rotation
 rotation = MatrixFunc([
-    (cos, lambda x: -sin(x)),
-    (sin, cos)
+    (cos, lambda x: -sin(x), 0),
+    (sin, cos, 0),
+    (0, 0, 1)
 ])
 
 rotate_45 = rotation(pi/4)
 
-v = Vector([0, 1])
+v = Vector([1, 1, 1])
 u = rotate_45 @ v
 
 ```
@@ -103,7 +109,9 @@ u = rotate_45 @ v
 
 #### VectorFunc
 
-VectorFunc is similar to a function of many variables.
+VectorFunc is similar to a vector-valued function (of several variables).
+It wraps each element in a Func.
+The sum and multiplication by a scalar will be VectorFunc again.
 
 ```python
 from math import sin, cos
@@ -120,6 +128,7 @@ assert curve(1) == (parabola + circle)(1)
 ```
 
 VectorFunc also has a grad attribute.
+Operations will change grad (if it's not None).
 
 ```python
 from math import sin, cos

@@ -5,14 +5,13 @@ from ..matrix import Matrix
 
 from .func import Func
 
+from ..typedefs import T
+
 
 def has_grad(*args) -> bool:
     if all(f.grad is not None for f in args):
         return True
     return False
-
-
-T = TypeVar('T')
 
 
 class VectorFunc:
