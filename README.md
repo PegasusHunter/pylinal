@@ -59,28 +59,6 @@ type(av) == Vector
 
 ### Functions
 
-```python
-from pylinal import Matrix, Vector
-
-
-A = Matrix([
-    [-1, 0, 0],
-    [0, 1, 0],
-    [0, 0, 1]
-])
-v = Vector([3, -1, 2])
-
-reflection = lambda x: A @ x
-motion = lambda x: x + v
-
-affine = lambda x: motion(reflection(x))
-
-x = Vector([1, 1, 1])
-assert affine(x) == A @ x + v
-
-```
-
-
 #### MatrixFunc
 
 MatrixFunc is a callable Matrix where each element is a function.
@@ -128,7 +106,7 @@ assert curve(1) == (parabola + circle)(1)
 ```
 
 VectorFunc also has a grad attribute.
-Operations will change grad (if it's not None).
+Operations will change grad (if grad is not None).
 
 ```python
 from math import sin, cos
