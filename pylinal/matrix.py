@@ -1,3 +1,5 @@
+import itertools
+
 from typing import (
     List,
     TypeVar,
@@ -61,11 +63,15 @@ class Matrix(TensorProtocol[T]):
     def __iter__(self) -> Iterator[Vector]:
         rows: Iterator[Vector] = (v for v in self._rows)
         return rows
+ 
+    def flatten(self) -> Vector:
+        elements: Iterator[T] = (el for row in self._rows for el in row)
+        return Vector(elements)
 
     def copy(self) -> 'Matrix':
         rows: Iterator[Vector] = (v.copy() for v in self)
         return Matrix(rows, _Matrix__wrap=False)
-
+    
     def __add__(self, other: Union['Matrix', Sequence]) -> 'Matrix':
         other = align_dim(self, other=other)
 

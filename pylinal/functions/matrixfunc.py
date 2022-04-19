@@ -36,9 +36,12 @@ class MatrixFunc(Matrix):
         )
         return result
 
+    def flatten(self) -> VectorFunc:
+        v: Vector[Func] = Vector(el for row in self for el in row)
+        return VectorFunc(v, _VectorFunc__wrap=False)
+
     def copy(self) -> 'MatrixFunc':
-        return MatrixFunc(self.matrix.copy(), _MatrixFunc__wrap=False)
-        
+        return MatrixFunc(self.matrix.copy(), _MatrixFunc__wrap=False)        
 
     @property
     def shape(self) -> Tuple[int, int]:

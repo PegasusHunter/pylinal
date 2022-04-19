@@ -1,4 +1,5 @@
 import random
+import itertools
 from typing import Tuple, List
 
 from pylinal import Vector, Matrix
@@ -19,6 +20,32 @@ def random_rows(shape: Tuple[int, int], integer: bool = False) -> List:
 
 
 class TestMatrix:
+
+    def test_flatten(self):
+        rows = [
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9]
+        ]
+        m = Matrix(rows)
+        
+        def chain(rows: List[List]) -> List:
+            flatten = [el for row in rows for el in row]
+            return flatten
+
+        assert m.flatten() == Vector(el for el in itertools.chain(*rows))
+        assert m.flatten() == Vector(rows[0] + rows[1] + rows[2])
+
+        tries = random.randint(5, 10)
+        for _ in range(tries):
+            shape = (random.randint(1, 10), random.randint(1, 10))
+            rows = random_rows(shape, integer=True)
+            m = Matrix(rows)
+            
+            assert m.flatten() == Vector(chain(rows))
+            assert m.flatten() == Vector(itertools.chain(*rows))
+
+        return
 
     def test_init(self):
         rows = [

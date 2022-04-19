@@ -44,13 +44,16 @@ a = Matrix([
     [2.4, 2, 5],
 ])
 
-b = Matrix(range(3) for i in range(2)) # Matrix with shape (2, 3)
+b = Matrix(range(3) for i in range(2))
+assert b.shape == (2, 3)
+
 c = a - b
 
-ab = a.matmul(b.T) # or a @ b.T
+ab = a.matmul(b.T)  # or a @ b.T
 type(ab) == Matrix
 
 v = Vector([2, 1.2, 3])
+
 av = a.matmul(v)  # or a @ v
 type(av) == Vector
 
@@ -113,7 +116,6 @@ from math import sin, cos
 from pylinal import VectorFunc
 
 
-# t != 0
 df = VectorFunc([1, lambda t: -cos(1/t) + 2*t*sin(1/t)])
 f = VectorFunc([lambda t: t, lambda t: t**2 * sin(1/t)], grad=df)
 
