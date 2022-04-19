@@ -16,4 +16,3 @@ affine = lambda x: motion(reflection(x))
 x = Vector([1, 1, 1])
 assert affine(x) == A @ x + v
 
-
