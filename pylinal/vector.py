@@ -84,10 +84,10 @@ class Vector(TensorProtocol[Scalar]):
         return Vector(y - x for x, y in zip(self, other))
 
     def __mul__(self, scalar: Scalar) -> 'Vector':
-        return Vector(scalar * x for x in self)
+        return Vector(x * scalar for x in self)
     
     def __rmul__(self, scalar: Scalar) -> 'Vector':
-        return Vector(x * scalar for x in self)
+        return Vector(scalar * x for x in self)
 
     def dot(self, other: Union['Vector', Any]) -> Scalar:
         try:

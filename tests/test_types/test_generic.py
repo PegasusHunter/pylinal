@@ -16,6 +16,6 @@ class T:
         return self.x == other.x
 
 
-def test_generic_mul():
+def test_mul():
     v = Vector([T(1), T(1)])
     assert T(2) * v == v * T(2)
