@@ -1,10 +1,34 @@
-from typing import Protocol, Union, TypeVar
+from typing import Protocol, TypeVar, Generic
 
 
-T = TypeVar('T', bound=Union[int, float, complex])
+class Ring(Protocol):
+
+    def __radd__(self, other):
+        ...
+
+    def __add__(self, other):
+        ...
+
+    def __rsub__(self, other):
+        ...
+
+    def __sub__(self, other):
+        ...
+
+    def __rmul__(self, other):
+        ...
+
+    def __mul__(self, other):
+        ...
+
+    def __neg__(self):
+        ...
 
 
-class TensorProtocol(Protocol[T]):
+Scalar = TypeVar('Scalar', bound=Ring)
+
+
+class TensorProtocol(Generic[Scalar]):
 
     def __add__(self, other):
         ...
@@ -12,10 +36,9 @@ class TensorProtocol(Protocol[T]):
     def __sub__(self, other):
         ...
 
-    def __mult__(self, other):
+    def __mul__(self, other):
         ...
 
-    def __rmult__(self, other):
+    def __rmul__(self, other):
         ...
-
 

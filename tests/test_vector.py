@@ -11,6 +11,20 @@ def random_elements(dim: int) -> List:
 
 class TestVector:
 
+    def test_pos(self):
+        dim = random.randint(0, 10)
+        elements = random_elements(dim)
+        v = Vector(elements)
+        assert +Vector(elements) == +v == v
+        return
+
+    def test_neg(self):
+        dim = random.randint(0, 10)
+        elements = random_elements(dim)
+        v = Vector(elements)
+        assert -Vector(elements) == -v == Vector(-x for x in elements)
+        return
+
     def test_init(self):
         sequence = [1, 2, 3]
         v = Vector(sequence)
