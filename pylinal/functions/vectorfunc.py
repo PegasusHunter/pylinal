@@ -1,99 +1,104 @@
-from typing import TypeVar, Union, Optional, Iterator, Sequence
+from typing import (
+    Union,
+    Optional,
+    Iterator,
+    Iterable,
+)
 
 from ..vector import Vector
 from ..matrix import Matrix
-
 from .func import Func
 
-from ..typedefs import T
+from ..typedefs import Scalar
 
-
-def has_grad(*args) -> bool:
-    if all(f.grad is not None for f in args):
-        return True
-    return False
+Grad = Union['VectorFunc', Matrix]
 
 
 class VectorFunc:
-    grad: Optional[Union['VectorFunc', Matrix]]
+    grad: Optional[Grad]
     vec: Vector[Func]
 
     def __init__(
         self,
-        sequence: Union[Iterator, Sequence, Vector],
+        sequence: Iterable,
         *,
-        grad: Optional[Union['VectorFunc', Matrix]] = None,
-        __wrap: bool = True,
+        grad: Optional[Grad] = None,
+        _wrap: bool = True,
     ) -> None:
-        if __wrap:
+        if _wrap:
             seq = (Func(f) for f in sequence)
             self.vec = Vector(seq)
         else:
-            self.vec = sequence
+            self.vec = sequence  # type: ignore
         self.grad = grad
         return
 
     def __call__(self, *args, **kwargs) -> Vector:
-        result = Vector(f(*args, **kwargs) for f in self)
+        result: Vector = Vector(f(*args, **kwargs) for f in self)
         return result
     
     def dot(self, other: 'VectorFunc') -> 'Func':
-        return self.vec.dot(other.vec)
+        return self.vec.dot(other.vec)  # type: ignore
     
-    def __add__(self, other: 'VectorFunc') -> 'VectorFunc':
+    def __add__(self, other: 'VectorFunc') -> 'VectorFunc':  # type: ignore[override]
         vec: Vector = self.vec + other.vec
+        
         grad = None
-        if has_grad(self, other):
-            grad = self.grad + other.grad
-        return VectorFunc(vec, grad=grad, _VectorFunc__wrap=False)
+        if self.grad and other.grad:
+            grad = self.grad + other.grad  # type: ignore
 
-    def __radd__(self, other: 'VectorFunc') -> 'VectorFunc':
+        return VectorFunc(vec, grad=grad, _wrap=False)
+
+    def __radd__(self, other: 'VectorFunc') -> 'VectorFunc':  # type: ignore[override]
         vec: Vector = other.vec + self.vec
+        
         grad = None
-        if has_grad(self, other):
-            grad = other.grad + self.grad
-        return VectorFunc(vec, grad=grad, _VectorFunc__wrap=False)
+        if self.grad and other.grad:
+            grad = other.grad + self.grad  # type: ignore
+        
+        return VectorFunc(vec, grad=grad, _wrap=False)
 
     def __sub__(self, other: 'VectorFunc') -> 'VectorFunc':
         vec = self.vec - other.vec
+        
         grad = None
-        if has_grad(self, grad):
-            grad = self.grad - other.grad
-        return VectorFunc(vec, grad=grad, _VectorFunc__wrap=False)
+        if self.grad and other.grad:
+            grad = self.grad - other.grad  # type: ignore
+        
+        return VectorFunc(vec, grad=grad, _wrap=False)
 
     def __rsub__(self, other: 'VectorFunc') -> 'VectorFunc':
         vec: Vector = other.vec - self.vec
+        
         grad = None
-        if has_grad(self, other):
-            grad = other.grad - self.grad
-        return VectorFunc(vec, grad=grad, _VectorFunc__wrap=False)
+        if self.grad and other.grad:
+            grad = other.grad - self.grad  # type: ignore
+        
+        return VectorFunc(vec, grad=grad, _wrap=False)
 
-    def __mul__(self, scalar: T) -> 'VectorFunc':
-        vec: Vector = self.vec * scalar
-        grad = None
-        if has_grad(self):
-            grad = self.grad * scalar
-        return VectorFunc(vec, grad=grad, _VectorFunc__wrap=False)
+    def __mul__(self, scalar: Func) -> 'VectorFunc':
+        vec: Vector = self.vec * scalar         
+        grad = self.grad * scalar if self.grad else None
 
-    def __rmul__(self, scalar: T) -> 'VectorFunc':
+        return VectorFunc(vec, grad=grad, _wrap=False)
+
+    def __rmul__(self, scalar: Scalar) -> 'VectorFunc':
         vec: Vector = scalar * self.vec
-        grad = None
-        if has_grad(self):
-            grad = scalar * self.grad
-        return VectorFunc(vec, grad=grad, _VectorFunc__wrap=False)
+        grad = scalar * self.grad if self.grad else None
+        
+        return VectorFunc(vec, grad=grad, _wrap=False)
     
     def __pos__(self) -> 'VectorFunc':
-        self
+        return self
 
     def __neg__(self) -> 'VectorFunc':
         vec: Vector = -self.vec
-        grad = None
-        if has_grad(self):
-            grad = -self.grad
-        return VectorFunc(vec, grad=grad, _VectorFunc__wrap=False)
+        grad = -self.grad if self.grad else None
+        
+        return VectorFunc(vec, grad=grad, _wrap=False)
 
-    def __getitem__(self, index: int) -> Func:
-        return self.vec[index]
+    def __getitem__(self, key: Union[int, slice]) -> Union[Func, Vector]:
+        return self.vec[key]
 
     def __iter__(self) -> Iterator[Func]:
         return iter(self.vec)
@@ -109,7 +114,7 @@ class VectorFunc:
         self = self - other
         return self
 
-    def __imul__(self, scalar: T) -> 'VectorFunc':
+    def __imul__(self, scalar: Scalar) -> 'VectorFunc':
         self = scalar * self
         return self
 
@@ -119,12 +124,13 @@ class VectorFunc:
     def __repr__(self) -> str:
         seq = [f for f in self]
 
+        string: str
         if isinstance(self.grad, VectorFunc):
-            string: str = f'{seq}, grad=VectorFunc(...)'
+            string = f'{seq}, grad=VectorFunc(...)'
         elif isinstance(self.grad, Matrix):
-            string: str = f'{seq}, grad=Matrix(...)'
+            string = f'{seq}, grad=Matrix(...)'
         else:
-            string: str = f'{seq}, grad={type(self.grad)}'
+            string = f'{seq}, grad={type(self.grad)}'
 
         return f'VectorFunc({string})'
 

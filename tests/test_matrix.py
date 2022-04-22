@@ -21,6 +21,20 @@ def random_rows(shape: Tuple[int, int], integer: bool = False) -> List:
 
 class TestMatrix:
 
+    def test_pos(self):
+        shape = random.randint(1, 10), random.randint(1, 10)
+        rows = random_rows(shape)
+        m = Matrix(rows)
+        assert +Matrix(rows) == +m == m
+        return
+
+    def test_neg(self):
+        shape = random.randint(1, 10), random.randint(1, 10)
+        rows = random_rows(shape)
+        m = Matrix(rows)
+        assert -Matrix(rows) == -m == Matrix(-Vector(r) for r in rows)
+        return
+
     def test_flatten(self):
         rows = [
             [1, 2, 3],
@@ -259,7 +273,6 @@ class TestMatrix:
         assert (a[0][0], a[0][1], a[0][2]) == (1, 2, 3)
         assert (a[1][0], a[1][1], a[1][2]) == (4, 5, 6)
 
-        
         assert a[0:1] == Matrix([[1, 2, 3]])
         assert a[0:] == a[:, :] == a
         

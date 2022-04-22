@@ -1,34 +1,39 @@
-from typing import List, TypeVar, Any, Sequence, Union, Iterator, Generic
-from .typedefs import T, TensorProtocol
+from typing import (
+    List, 
+    Any,
+    Union, 
+    Iterator,
+    Iterable,
+)
+from .typedefs import Scalar, TensorProtocol
 
 
-class Vector(TensorProtocol[T]):
-    _elements: List[T]
+class Vector(TensorProtocol[Scalar]):
+    _elements: List[Scalar]
     
-    def __init__(
-        self, 
-        sequence: Union[Iterator[T], Sequence[T], 'Vector']
-    ) -> None:
+    def __init__(self, sequence: Iterable = []) -> None:
         self._elements = [el for el in sequence]
         return
 
     def copy(self) -> 'Vector':
         return Vector(el for el in self)
 
-    def append(self, scalar: T) -> None:
+    def append(self, scalar: Scalar) -> None:
         self._elements.append(scalar)
         return
 
-    def pop(self) -> T:
+    def pop(self) -> Scalar:
         return self._elements.pop()
 
     def __add__(self, other: Union['Vector', Any]) -> 'Vector':
         try:
             assert len(self) == len(other)
+
         except TypeError: 
             error = f'unsupported operand type(s) for +: {type(self)} '\
                     f'and {type(other)}'
             raise TypeError(error)
+
         except AssertionError:
             error = 'To __add__ two vectors, the dimensions must be the same,'\
                     f' but dim {len(self)} != dim {len(other)}'
@@ -78,13 +83,13 @@ class Vector(TensorProtocol[T]):
 
         return Vector(y - x for x, y in zip(self, other))
 
-    def __mul__(self, scalar: T) -> 'Vector':
-        return Vector(x*scalar for x in self)
+    def __mul__(self, scalar: Scalar) -> 'Vector':
+        return Vector(scalar * x for x in self)
     
-    def __rmul__(self, scalar: T) -> 'Vector':
-        return Vector(scalar*x for x in self)
+    def __rmul__(self, scalar: Scalar) -> 'Vector':
+        return Vector(x * scalar for x in self)
 
-    def dot(self, other: Union['Vector', Any]) -> T:
+    def dot(self, other: Union['Vector', Any]) -> Scalar:
         try:
             assert len(self) == len(other)
         except TypeError:
@@ -95,13 +100,13 @@ class Vector(TensorProtocol[T]):
                     f' but dim {len(self)} != dim {len(other)}'
             raise ValueError(error)
 
-        return sum(x*y for x, y in zip(self, other))
+        return sum(x*y for x, y in zip(self, other))  # type: ignore
     
     def __pos__(self) -> 'Vector':
         return self
     
     def __neg__(self) -> 'Vector':
-        v = Vector(-el for el in self)
+        v: Vector = Vector(-el for el in self)
         return v
 
     def __eq__(self, other: Any) -> bool:
@@ -109,9 +114,11 @@ class Vector(TensorProtocol[T]):
             return False
         if len(self) != len(other):
             return False
+        
         for x, y in zip(self, other):
             if x != y:
                 return False
+        
         return True
 
     def __ne__(self, other: Any) -> bool:
@@ -119,12 +126,15 @@ class Vector(TensorProtocol[T]):
             return False
         return True
 
-    def __getitem__(self, key: Union[int, slice]) -> Union[T, 'Vector']:
-        if isinstance(key, slice):
-            v: Vector = Vector([])
-            v._elements = self._elements[key]
+    def __getitem__(self, key: Union[int, slice]) -> Union[Scalar, 'Vector']:
+        item: Union[Scalar, List] = self._elements[key]
+
+        if isinstance(item, list):
+            v: Vector = Vector()
+            v._elements = item
             return v
-        return self._elements[key]
+
+        return item
 
     def __setitem__(self, index: int, value: Any) -> None:
         self._elements[index] = value
@@ -133,10 +143,10 @@ class Vector(TensorProtocol[T]):
     def __len__(self) -> int:
         return len(self._elements)
     
-    def __iter__(self) -> Iterator[T]:
+    def __iter__(self) -> Iterator[Scalar]:
         return iter(self._elements)
     
-    def __reversed__(self) -> Iterator[T]:
+    def __reversed__(self) -> Iterator[Scalar]:
         return reversed(self._elements)
 
     def __iadd__(self, other: Union['Vector', Any]) -> 'Vector':
@@ -147,7 +157,7 @@ class Vector(TensorProtocol[T]):
         self = self - other
         return self
 
-    def __imul__(self, scalar: T) -> 'Vector':
+    def __imul__(self, scalar: Scalar) -> 'Vector':
         self = self * scalar
         return self
 
