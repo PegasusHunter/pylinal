@@ -23,15 +23,15 @@ def align_dim(self: 'Matrix', *, other: Any) -> Union['Matrix', List]:
         assert self.shape == other.shape
         return other
     
-    rows: int = self.shape[0]
-    assert len(other) == rows
-    
+    rows_len: int = self.shape[0]
     vec_len: int = self.shape[1]
 
     if hasattr(other[-1], '__len__'):
-        assert all(len(row) == vec_len for row in other)
+        assert len(other) == rows_len, f'shapes are not aligned: {rows_len} and {len(other)}'
+        assert all(len(row) == vec_len for row in other), 'shapes are not aligned'
     else:
-        other = [other for _ in range(rows)]
+        assert len(other) == vec_len, f'shapes are not aligned: {vec_len} and {len(other)}'
+        other = [other for _ in range(rows_len)]
 
     return other
 

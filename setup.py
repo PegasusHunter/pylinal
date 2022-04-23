@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 
-VERSION = '0.1.4'
+VERSION = '0.1.5'
 URL = 'https://github.com/cospectrum/pylinal.git'
 
 with open('README.md', 'r') as f:

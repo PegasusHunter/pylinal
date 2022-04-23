@@ -1,6 +1,23 @@
 from pylinal import Vector
 
 
+def main():
+    a = 4
+    v = Vector([2, 3, 4])
+    av: Vector = a*v
+
+    q = Quaternion(a, 0, 0, 0)
+    p = Quaternion(0, *v)
+
+    assert -p == p.conjugate()
+
+    qp: Quaternion = q * p
+    assert qp == Quaternion(0, *av)
+    print(f'q*p = {qp}')
+    
+    return
+
+
 class Quaternion:
     scalar: float   # scalar part
     vector: Vector[float]  # 3d vector
@@ -24,6 +41,19 @@ class Quaternion:
         vector: Vector = a*v + b*u + cross(u, v)
         return Quaternion(scalar, *vector)
 
+    def conjugate(self) -> 'Quaternion':
+        b, c, d = self.vector
+        return Quaternion(self.scalar, -b, -c, -d)
+
+    def __abs__(self) -> float:
+        a = self.scalar
+        b, c, d = self.vector
+        return (a**2 + b**2 + c**2 + d**2)**0.5
+
+    def __neg__(self) -> 'Quaternion': 
+        b, c, d = self.vector
+        return Quaternion(-self.scalar, -b, -c, -d)
+
     def __eq__(self, other: 'Quaternion') -> bool:
         return self.scalar == other.scalar and self.vector == other.vector
 
@@ -42,18 +72,6 @@ def cross(a: Vector, b: Vector) -> Vector:
     return Vector([first, second, third])
 
 
-def main():
-    a = 4
-    v = Vector([2, 3, 4])
-    av = a*v
-
-    q = Quaternion(a, 0, 0, 0)
-    p = Quaternion(0, *v)
-
-    qp: Quaternion = q * p
-    assert qp == Quaternion(0, *av)
-    print(qp)
-
-
 if __name__ == '__main__':
     main()
+
